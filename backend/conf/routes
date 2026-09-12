@@ -1,0 +1,14 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+
+GET     /api/kpis                          controllers.KpiController.list
+GET     /api/volume-trend                   controllers.VolumeTrendController.list
+GET     /api/resolution-split               controllers.ResolutionSplitController.list
+GET     /api/csat-trend                     controllers.CsatTrendController.list
+GET     /api/ticket-categories              controllers.TicketCategoryController.list
+GET     /api/response-time-distribution     controllers.ResponseTimeController.list
+GET     /api/channel-mix                    controllers.ChannelMixController.list
+GET     /api/agents                         controllers.AgentController.list
+GET     /api/conversations                  controllers.ConversationController.list
+GET     /api/conversations/:id              controllers.ConversationController.get(id: String)
+GET     /api/automation-rules               controllers.AutomationRuleController.list

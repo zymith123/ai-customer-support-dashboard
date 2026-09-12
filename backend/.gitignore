@@ -1,0 +1,11 @@
+target/
+project/target/
+project/project/
+*.class
+*.log
+.bsp/
+.bloop/
+.metals/
+.vscode/
+logs/
+RUNNING_PID
