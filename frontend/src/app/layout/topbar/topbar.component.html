@@ -1,0 +1,52 @@
+<header
+  class="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-surface/90 px-4 py-3 backdrop-blur sm:px-6"
+>
+  <button
+    type="button"
+    class="rounded-lg p-2 text-ink-secondary hover:bg-surface-sunken md:hidden"
+    (click)="layout.toggleMobileSidebar()"
+    aria-label="Toggle navigation"
+  >
+    <lucide-icon name="Menu" [size]="20"></lucide-icon>
+  </button>
+
+  <h1 class="text-lg font-semibold text-ink-primary">{{ title() }}</h1>
+
+  <div class="ml-auto flex items-center gap-2 sm:gap-3">
+    <div class="relative hidden sm:block">
+      <lucide-icon
+        name="Search"
+        [size]="16"
+        class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"
+      ></lucide-icon>
+      <input
+        type="text"
+        placeholder="Search conversations..."
+        class="w-56 rounded-xl border border-border bg-surface-sunken py-2 pl-9 pr-3 text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-brand/40 lg:w-72"
+      />
+    </div>
+
+    <button
+      type="button"
+      class="rounded-lg p-2 text-ink-secondary hover:bg-surface-sunken"
+      (click)="theme.toggle()"
+      aria-label="Toggle theme"
+    >
+      <lucide-icon [name]="theme.mode() === 'dark' ? 'Sun' : 'Moon'" [size]="18"></lucide-icon>
+    </button>
+
+    <button
+      type="button"
+      class="relative rounded-lg p-2 text-ink-secondary hover:bg-surface-sunken"
+      aria-label="Notifications"
+    >
+      <lucide-icon name="Bell" [size]="18"></lucide-icon>
+      <span class="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-status-critical"></span>
+    </button>
+
+    <div class="ml-1 flex items-center gap-2 border-l border-border pl-3">
+      <app-avatar name="Jordan Ellis" color="#4a3aa7" size="sm"></app-avatar>
+      <span class="hidden text-sm font-medium text-ink-primary sm:inline">Jordan Ellis</span>
+    </div>
+  </div>
+</header>

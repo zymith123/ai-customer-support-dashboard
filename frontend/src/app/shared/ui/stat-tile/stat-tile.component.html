@@ -1,0 +1,15 @@
+<div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+  <p class="text-sm text-ink-secondary">{{ kpi.label }}</p>
+  <p class="mt-2 text-3xl font-semibold tabular-nums text-ink-primary">{{ kpi.value }}</p>
+  <div class="mt-3 flex items-center gap-1.5 text-sm">
+    <span
+      class="inline-flex items-center gap-0.5 font-medium tabular-nums"
+      [class.text-status-good-text]="kpi.deltaDir === 'up'"
+      [class.text-status-critical]="kpi.deltaDir === 'down'"
+    >
+      <lucide-icon [name]="kpi.deltaDir === 'up' ? 'ArrowUp' : 'ArrowDown'" [size]="14"></lucide-icon>
+      {{ kpi.delta }}
+    </span>
+    <span class="text-ink-muted">{{ kpi.sub }}</span>
+  </div>
+</div>

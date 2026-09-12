@@ -1,0 +1,45 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.{html,ts}'],
+  darkMode: ['class', '[data-theme="dark"]'],
+  theme: {
+    extend: {
+      colors: {
+        page: 'var(--color-page)',
+        surface: 'var(--color-surface)',
+        'surface-raised': 'var(--color-surface-raised)',
+        'surface-sunken': 'var(--color-surface-sunken)',
+        'ink-primary': 'var(--color-ink-primary)',
+        'ink-secondary': 'var(--color-ink-secondary)',
+        'ink-muted': 'var(--color-ink-muted)',
+        border: 'var(--color-border)',
+        'border-strong': 'var(--color-border-strong)',
+        grid: 'var(--color-grid)',
+        axis: 'var(--color-axis)',
+        brand: 'var(--color-brand)',
+        'brand-strong': 'var(--color-brand-strong)',
+        'brand-soft': 'var(--color-brand-soft)',
+        'series-1': 'var(--series-1)',
+        'series-2': 'var(--series-2)',
+        'series-3': 'var(--series-3)',
+        'series-4': 'var(--series-4)',
+        'series-5': 'var(--series-5)',
+        'series-6': 'var(--series-6)',
+        'series-7': 'var(--series-7)',
+        'series-8': 'var(--series-8)',
+        'status-good': 'var(--status-good)',
+        'status-good-text': 'var(--status-good-text)',
+        'status-warning': 'var(--status-warning)',
+        'status-serious': 'var(--status-serious)',
+        'status-critical': 'var(--status-critical)',
+      },
+      fontFamily: {
+        sans: ['system-ui', '-apple-system', '"Segoe UI"', 'sans-serif'],
+      },
+      borderRadius: {
+        '2xl': '1rem',
+      },
+    },
+  },
+  plugins: [],
+};

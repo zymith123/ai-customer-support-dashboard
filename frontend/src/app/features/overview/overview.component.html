@@ -1,0 +1,156 @@
+<div class="flex flex-col gap-6">
+  <!-- KPI tiles -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    @if (kpis(); as list) {
+      @if (list.length) {
+        @for (kpi of list; track kpi.label) {
+          <app-stat-tile [kpi]="kpi"></app-stat-tile>
+        }
+      } @else {
+        <p class="col-span-full rounded-2xl border border-border bg-surface p-5 text-sm text-ink-muted">
+          No KPI data available yet.
+        </p>
+      }
+    } @else {
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="h-[104px] animate-pulse rounded-2xl border border-border bg-surface-sunken"></div>
+      }
+    }
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+    <!-- Volume trend -->
+    <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm xl:col-span-2">
+      <h2 class="text-sm font-semibold text-ink-primary">Conversation volume — last 7 days</h2>
+      <div class="mt-3 flex flex-wrap items-center gap-4">
+        @for (item of volumeLegend; track item.label) {
+          <span class="flex items-center gap-1.5 text-xs text-ink-secondary">
+            <span class="h-2 w-2 rounded-full" [style.backgroundColor]="item.color"></span>
+            {{ item.label }}
+          </span>
+        }
+      </div>
+      <div class="relative mt-4 h-64 w-full">
+        <canvas baseChart [data]="volumeChartData" [options]="volumeChartOptions" type="line"></canvas>
+      </div>
+    </div>
+
+    <!-- Resolution split -->
+    <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <h2 class="text-sm font-semibold text-ink-primary">Resolution split</h2>
+      @if (resolutionSplit(); as slices) {
+        @if (slices.length) {
+          <app-donut-chart
+            [labels]="resolutionLabels()"
+            [values]="resolutionValues()"
+            [colors]="resolutionColors()"
+          ></app-donut-chart>
+          <ul class="mt-2 flex flex-col gap-2">
+            @for (slice of slices; track slice.key) {
+              <li class="flex items-center justify-between text-sm">
+                <span class="flex items-center gap-2 text-ink-secondary">
+                  <span
+                    class="h-2 w-2 rounded-full"
+                    [style.backgroundColor]="resolutionColor(slice.key)"
+                  ></span>
+                  {{ slice.name }}
+                </span>
+                <span class="font-medium tabular-nums text-ink-primary"
+                  >{{ resolutionPct(slice.value) }}%</span
+                >
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="mt-4 text-sm text-ink-muted">No resolution data available yet.</p>
+        }
+      } @else {
+        <div class="mt-4 h-56 animate-pulse rounded-xl bg-surface-sunken"></div>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+    <!-- Recent conversations -->
+    <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm xl:col-span-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-ink-primary">Recent conversations</h2>
+        <a routerLink="/conversations" class="text-xs font-medium text-brand hover:underline">View all</a>
+      </div>
+      <div class="mt-3 flex flex-col divide-y divide-border">
+        @if (conversations(); as list) {
+          @if (list.length) {
+            @for (c of recentConversations(); track c.id) {
+              <div class="flex items-center gap-3 py-3">
+                <app-avatar [name]="c.customer" [color]="c.avatarColor"></app-avatar>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <span class="truncate text-sm font-medium text-ink-primary">{{ c.customer }}</span>
+                    <app-channel-icon [channel]="c.channel" [size]="13" class="text-ink-muted"></app-channel-icon>
+                  </div>
+                  <p class="truncate text-xs text-ink-secondary">{{ c.subject }}</p>
+                  <p class="truncate text-xs capitalize text-ink-muted">{{ c.sentiment }} sentiment</p>
+                </div>
+                <div class="flex shrink-0 flex-col items-end gap-1">
+                  <app-status-badge [status]="c.status"></app-status-badge>
+                  <span class="text-xs text-ink-muted">{{ c.updated }}</span>
+                </div>
+              </div>
+            }
+          } @else {
+            <p class="py-6 text-center text-sm text-ink-muted">No conversations yet.</p>
+          }
+        } @else {
+          @for (i of [1, 2, 3, 4, 5]; track i) {
+            <div class="flex items-center gap-3 py-3">
+              <div class="h-8 w-8 animate-pulse rounded-full bg-surface-sunken"></div>
+              <div class="h-4 flex-1 animate-pulse rounded bg-surface-sunken"></div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Top agents -->
+    <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-ink-primary">Top agents</h2>
+        <a routerLink="/agents" class="text-xs font-medium text-brand hover:underline">View all</a>
+      </div>
+      <div class="mt-3 flex flex-col gap-3">
+        @if (agents(); as list) {
+          @if (list.length) {
+            @for (a of topAgents(); track a.id; let i = $index) {
+              <div class="flex items-center gap-3">
+                <span class="w-4 text-xs font-medium tabular-nums text-ink-muted">{{ i + 1 }}</span>
+                <app-avatar [name]="a.name" [color]="a.avatarColor" size="sm"></app-avatar>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5">
+                    <span class="truncate text-sm font-medium text-ink-primary">{{ a.name }}</span>
+                    @if (a.type === 'AI') {
+                      <span
+                        class="rounded-full bg-brand-soft px-1.5 py-0.5 text-[10px] font-semibold text-brand-strong"
+                        >AI</span
+                      >
+                    }
+                  </div>
+                  <p class="text-xs text-ink-muted">{{ a.resolved.toLocaleString() }} resolved</p>
+                </div>
+                <span class="text-xs font-medium tabular-nums text-ink-secondary">{{ a.csat }} CSAT</span>
+              </div>
+            }
+          } @else {
+            <p class="py-6 text-center text-sm text-ink-muted">No agent data yet.</p>
+          }
+        } @else {
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="flex items-center gap-3">
+              <div class="h-6 w-6 animate-pulse rounded-full bg-surface-sunken"></div>
+              <div class="h-4 flex-1 animate-pulse rounded bg-surface-sunken"></div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

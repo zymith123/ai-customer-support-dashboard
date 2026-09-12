@@ -1,0 +1,39 @@
+@if (layout.mobileSidebarOpen()) {
+  <div
+    class="fixed inset-0 z-40 bg-black/40 md:hidden"
+    (click)="layout.closeMobileSidebar()"
+  ></div>
+}
+
+<aside
+  class="fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 -translate-x-full flex-col border-r border-border bg-surface p-4 transition-transform duration-200 md:static md:translate-x-0"
+  [class.translate-x-0]="layout.mobileSidebarOpen()"
+>
+  <div class="flex items-center gap-2 px-2 py-2">
+    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-white">
+      <lucide-icon name="Sparkles" [size]="18"></lucide-icon>
+    </div>
+    <span class="text-base font-semibold tracking-tight text-ink-primary">Aria Support</span>
+  </div>
+
+  <nav class="mt-6 flex flex-1 flex-col gap-1">
+    @for (item of navItems; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="bg-brand-soft text-brand-strong"
+        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+        (click)="layout.closeMobileSidebar()"
+        class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface-sunken hover:text-ink-primary"
+      >
+        <lucide-icon [name]="item.icon" [size]="18"></lucide-icon>
+        {{ item.label }}
+      </a>
+    }
+  </nav>
+
+  <div class="mt-4 rounded-2xl border border-border bg-surface-sunken p-4">
+    <p class="text-xs font-medium uppercase tracking-wide text-ink-muted">AI autonomy this week</p>
+    <p class="mt-1 text-2xl font-semibold tabular-nums text-ink-primary">82%</p>
+    <p class="mt-1 text-xs text-ink-muted">of conversations resolved without a human</p>
+  </div>
+</aside>

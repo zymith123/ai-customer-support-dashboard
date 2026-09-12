@@ -1,0 +1,218 @@
+<div class="flex max-w-3xl flex-col gap-6">
+  <!-- AI behavior -->
+  <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <h2 class="text-sm font-semibold text-ink-primary">AI behavior</h2>
+    <p class="mt-1 text-xs text-ink-muted">Control how autonomously the AI agents act.</p>
+
+    <div class="mt-4 flex flex-col divide-y divide-border">
+      <div class="flex items-center justify-between py-3">
+        <div>
+          <p class="text-sm font-medium text-ink-primary">Auto-resolve simple requests</p>
+          <p class="text-xs text-ink-muted">Let AI close tickets it's highly confident about.</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="autoResolve()"
+          (click)="autoResolve.set(!autoResolve())"
+          class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+          [class.bg-brand]="autoResolve()"
+          [class.bg-surface-sunken]="!autoResolve()"
+        >
+          <span
+            class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform"
+            [class.translate-x-[22px]]="autoResolve()"
+            [class.translate-x-0.5]="!autoResolve()"
+          ></span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between py-3">
+        <div>
+          <p class="text-sm font-medium text-ink-primary">Proactive offers</p>
+          <p class="text-xs text-ink-muted">Let AI proactively suggest discounts or credits.</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="proactiveOffers()"
+          (click)="proactiveOffers.set(!proactiveOffers())"
+          class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+          [class.bg-brand]="proactiveOffers()"
+          [class.bg-surface-sunken]="!proactiveOffers()"
+        >
+          <span
+            class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform"
+            [class.translate-x-[22px]]="proactiveOffers()"
+            [class.translate-x-0.5]="!proactiveOffers()"
+          ></span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between py-3">
+        <div>
+          <p class="text-sm font-medium text-ink-primary">Auto-translate</p>
+          <p class="text-xs text-ink-muted">Automatically translate replies to the customer's language.</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="autoTranslate()"
+          (click)="autoTranslate.set(!autoTranslate())"
+          class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+          [class.bg-brand]="autoTranslate()"
+          [class.bg-surface-sunken]="!autoTranslate()"
+        >
+          <span
+            class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform"
+            [class.translate-x-[22px]]="autoTranslate()"
+            [class.translate-x-0.5]="!autoTranslate()"
+          ></span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between py-3">
+        <div>
+          <p class="text-sm font-medium text-ink-primary">Escalate on negative sentiment</p>
+          <p class="text-xs text-ink-muted">Hand off to a human when sentiment turns negative.</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="escalateOnNegativeSentiment()"
+          (click)="escalateOnNegativeSentiment.set(!escalateOnNegativeSentiment())"
+          class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+          [class.bg-brand]="escalateOnNegativeSentiment()"
+          [class.bg-surface-sunken]="!escalateOnNegativeSentiment()"
+        >
+          <span
+            class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform"
+            [class.translate-x-[22px]]="escalateOnNegativeSentiment()"
+            [class.translate-x-0.5]="!escalateOnNegativeSentiment()"
+          ></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tone -->
+  <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <h2 class="text-sm font-semibold text-ink-primary">Reply tone</h2>
+    <p class="mt-1 text-xs text-ink-muted">The voice AI agents use when writing replies.</p>
+    <div class="mt-4 flex flex-wrap gap-2">
+      @for (tone of tones; track tone) {
+        <button
+          type="button"
+          (click)="selectedTone.set(tone)"
+          class="rounded-full border px-4 py-1.5 text-sm font-medium capitalize transition-colors"
+          [class.border-brand]="selectedTone() === tone"
+          [class.bg-brand-soft]="selectedTone() === tone"
+          [class.text-brand-strong]="selectedTone() === tone"
+          [class.border-border]="selectedTone() !== tone"
+          [class.text-ink-secondary]="selectedTone() !== tone"
+        >
+          {{ tone }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Confidence threshold -->
+  <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-ink-primary">AI confidence threshold</h2>
+      <span class="text-sm font-medium tabular-nums text-ink-primary">{{ confidenceThreshold() }}%</span>
+    </div>
+    <p class="mt-1 text-xs text-ink-muted">Minimum confidence required before the AI replies autonomously.</p>
+    <input
+      type="range"
+      min="0"
+      max="100"
+      step="1"
+      [value]="confidenceThreshold()"
+      (input)="confidenceThreshold.set(+$any($event.target).value)"
+      class="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-surface-sunken accent-[var(--color-brand)]"
+    />
+  </div>
+
+  <!-- Notifications -->
+  <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <h2 class="text-sm font-semibold text-ink-primary">Notifications</h2>
+    <div class="mt-4 flex flex-col divide-y divide-border">
+      <div class="flex items-center justify-between py-3">
+        <p class="text-sm font-medium text-ink-primary">Daily email digest</p>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="emailDigest()"
+          (click)="emailDigest.set(!emailDigest())"
+          class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+          [class.bg-brand]="emailDigest()"
+          [class.bg-surface-sunken]="!emailDigest()"
+        >
+          <span
+            class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform"
+            [class.translate-x-[22px]]="emailDigest()"
+            [class.translate-x-0.5]="!emailDigest()"
+          ></span>
+        </button>
+      </div>
+      <div class="flex items-center justify-between py-3">
+        <p class="text-sm font-medium text-ink-primary">Slack alerts</p>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="slackAlerts()"
+          (click)="slackAlerts.set(!slackAlerts())"
+          class="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+          [class.bg-brand]="slackAlerts()"
+          [class.bg-surface-sunken]="!slackAlerts()"
+        >
+          <span
+            class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform"
+            [class.translate-x-[22px]]="slackAlerts()"
+            [class.translate-x-0.5]="!slackAlerts()"
+          ></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workspace info -->
+  <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <h2 class="text-sm font-semibold text-ink-primary">Workspace</h2>
+    <div class="mt-4 flex flex-col gap-4">
+      <label class="flex flex-col gap-1.5">
+        <span class="text-xs font-medium text-ink-secondary">Workspace name</span>
+        <input
+          type="text"
+          [(ngModel)]="workspaceName"
+          class="rounded-xl border border-border bg-surface-sunken px-3 py-2 text-sm text-ink-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+        />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="text-xs font-medium text-ink-secondary">Support email</span>
+        <input
+          type="email"
+          [(ngModel)]="supportEmail"
+          class="rounded-xl border border-border bg-surface-sunken px-3 py-2 text-sm text-ink-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+        />
+      </label>
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="saveWorkspace()"
+          class="rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-strong"
+        >
+          Save changes
+        </button>
+        @if (savedJustNow()) {
+          <span class="flex items-center gap-1.5 text-xs font-medium text-status-good-text">
+            <lucide-icon name="Check" [size]="14"></lucide-icon>
+            Saved
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+</div>

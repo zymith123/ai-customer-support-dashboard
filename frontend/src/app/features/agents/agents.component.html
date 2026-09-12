@@ -1,0 +1,164 @@
+<div class="flex flex-col gap-6">
+  <!-- Summary banner -->
+  <div class="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
+        <lucide-icon name="Bot" [size]="20"></lucide-icon>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-ink-primary">Workforce overview</p>
+        <p class="text-xs text-ink-muted">{{ aiAgents().length }} AI agents · {{ humanAgents().length }} human agents</p>
+      </div>
+    </div>
+    <div class="flex gap-6">
+      <div>
+        <p class="text-xs text-ink-muted">Total resolved</p>
+        <p class="text-lg font-semibold tabular-nums text-ink-primary">{{ totalResolved().toLocaleString() }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-ink-muted">Avg. AI autonomy</p>
+        <p class="text-lg font-semibold tabular-nums text-ink-primary">{{ avgAutonomy() }}%</p>
+      </div>
+      <div>
+        <p class="text-xs text-ink-muted">Avg. CSAT</p>
+        <p class="text-lg font-semibold tabular-nums text-ink-primary">{{ avgCsat() }}</p>
+      </div>
+    </div>
+  </div>
+
+  @if (agents(); as list) {
+    @if (list.length) {
+      <!-- AI agent cards -->
+      <div>
+        <h2 class="mb-3 text-sm font-semibold text-ink-primary">AI agents</h2>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          @for (a of aiAgents(); track a.id) {
+            <div class="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+              <div class="flex items-center gap-3">
+                <app-avatar [name]="a.name" [color]="a.avatarColor"></app-avatar>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-semibold text-ink-primary">{{ a.name }}</p>
+                  <div class="flex items-center gap-1.5 text-xs text-ink-muted">
+                    <span class="h-1.5 w-1.5 rounded-full" [style.backgroundColor]="statusColor(a.status)"></span>
+                    <span class="capitalize">{{ a.status }}</span>
+                  </div>
+                </div>
+                @if (a.autonomyRate !== null) {
+                  <span class="shrink-0 rounded-full bg-brand-soft px-2 py-1 text-xs font-semibold text-brand-strong"
+                    >{{ a.autonomyRate }}% autonomy</span
+                  >
+                }
+              </div>
+              <div class="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-surface-sunken p-3 text-center">
+                <div>
+                  <p class="text-sm font-semibold tabular-nums text-ink-primary">{{ a.resolved.toLocaleString() }}</p>
+                  <p class="text-[10px] text-ink-muted">Resolved</p>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold tabular-nums text-ink-primary">{{ a.avgHandleTime }}</p>
+                  <p class="text-[10px] text-ink-muted">Avg. handle</p>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold tabular-nums text-ink-primary">{{ a.csat }}</p>
+                  <p class="text-[10px] text-ink-muted">CSAT</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Human agents -->
+      <div>
+        <h2 class="mb-3 text-sm font-semibold text-ink-primary">Human agents</h2>
+        <div class="flex flex-col divide-y divide-border rounded-2xl border border-border bg-surface shadow-sm">
+          @for (a of humanAgents(); track a.id) {
+            <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex items-center gap-3">
+                <app-avatar [name]="a.name" [color]="a.avatarColor"></app-avatar>
+                <div>
+                  <p class="text-sm font-semibold text-ink-primary">{{ a.name }}</p>
+                  <div class="flex items-center gap-1.5 text-xs text-ink-muted">
+                    <span class="h-1.5 w-1.5 rounded-full" [style.backgroundColor]="statusColor(a.status)"></span>
+                    <span class="capitalize">{{ a.status }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-6 text-center sm:text-right">
+                <div>
+                  <p class="text-sm font-semibold tabular-nums text-ink-primary">{{ a.resolved.toLocaleString() }}</p>
+                  <p class="text-[10px] text-ink-muted">Resolved</p>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold tabular-nums text-ink-primary">{{ a.avgHandleTime }}</p>
+                  <p class="text-[10px] text-ink-muted">Avg. handle</p>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold tabular-nums text-ink-primary">{{ a.csat }}</p>
+                  <p class="text-[10px] text-ink-muted">CSAT</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+      <p class="rounded-2xl border border-border bg-surface p-6 text-center text-sm text-ink-muted">
+        No agent data available yet.
+      </p>
+    }
+  } @else {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="h-40 animate-pulse rounded-2xl border border-border bg-surface-sunken"></div>
+      }
+    </div>
+  }
+
+  <!-- Automation rules -->
+  <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <h2 class="mb-3 text-sm font-semibold text-ink-primary">Automation rules</h2>
+    @if (rules(); as list) {
+      @if (list.length) {
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[560px] text-sm">
+            <thead>
+              <tr class="border-b border-border text-left text-xs text-ink-muted">
+                <th class="pb-2 font-medium">Rule</th>
+                <th class="pb-2 font-medium">Trigger → Action</th>
+                <th class="pb-2 font-medium">Hits</th>
+                <th class="pb-2 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border">
+              @for (r of list; track r.id) {
+                <tr>
+                  <td class="py-3 pr-4 font-medium text-ink-primary">{{ r.name }}</td>
+                  <td class="py-3 pr-4 text-ink-secondary">{{ r.trigger }} → {{ r.action }}</td>
+                  <td class="py-3 pr-4 tabular-nums text-ink-secondary">{{ r.hits }}</td>
+                  <td class="py-3">
+                    @if (r.enabled) {
+                      <span
+                        class="rounded-full px-2 py-0.5 text-xs font-medium text-status-good-text"
+                        style="background-color: rgba(12, 163, 12, 0.14)"
+                        >Enabled</span
+                      >
+                    } @else {
+                      <span class="rounded-full bg-surface-sunken px-2 py-0.5 text-xs font-medium text-ink-muted"
+                        >Disabled</span
+                      >
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="text-sm text-ink-muted">No automation rules available yet.</p>
+      }
+    } @else {
+      <div class="h-32 animate-pulse rounded-xl bg-surface-sunken"></div>
+    }
+  </div>
+</div>

@@ -1,0 +1,74 @@
+<div class="flex flex-col gap-6">
+  <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+    <!-- Ticket categories -->
+    <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <h2 class="text-sm font-semibold text-ink-primary">Tickets by category</h2>
+      @if (!categoriesLoaded()) {
+        <div class="mt-4 h-64 animate-pulse rounded-xl bg-surface-sunken"></div>
+      } @else if (categoriesEmpty()) {
+        <p class="mt-4 text-sm text-ink-muted">No category data available yet.</p>
+      } @else {
+        <div class="relative mt-4 h-64 w-full">
+          <canvas baseChart [data]="categoriesChartData" [options]="categoriesChartOptions" type="bar"></canvas>
+        </div>
+      }
+    </div>
+
+    <!-- Response time distribution -->
+    <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <h2 class="text-sm font-semibold text-ink-primary">Response time distribution</h2>
+      @if (!responseTimeLoaded()) {
+        <div class="mt-4 h-64 animate-pulse rounded-xl bg-surface-sunken"></div>
+      } @else if (responseTimeEmpty()) {
+        <p class="mt-4 text-sm text-ink-muted">No response time data available yet.</p>
+      } @else {
+        <div class="relative mt-4 h-64 w-full">
+          <canvas baseChart [data]="responseTimeChartData" [options]="responseTimeChartOptions" type="bar"></canvas>
+        </div>
+      }
+    </div>
+
+    <!-- CSAT trend -->
+    <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <h2 class="text-sm font-semibold text-ink-primary">CSAT trend — last 6 weeks</h2>
+      @if (!csatLoaded()) {
+        <div class="mt-4 h-64 animate-pulse rounded-xl bg-surface-sunken"></div>
+      } @else if (csatEmpty()) {
+        <p class="mt-4 text-sm text-ink-muted">No CSAT data available yet.</p>
+      } @else {
+        <div class="relative mt-4 h-64 w-full">
+          <canvas baseChart [data]="csatChartData" [options]="csatChartOptions" type="line"></canvas>
+        </div>
+      }
+    </div>
+
+    <!-- Channel mix -->
+    <div class="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <h2 class="text-sm font-semibold text-ink-primary">Channel mix</h2>
+      @if (channelMix(); as slices) {
+        @if (slices.length) {
+          <app-donut-chart
+            [labels]="channelLabels()"
+            [values]="channelValues()"
+            [colors]="channelColors()"
+          ></app-donut-chart>
+          <ul class="mt-2 flex flex-col gap-2">
+            @for (slice of slices; track slice.key) {
+              <li class="flex items-center justify-between text-sm">
+                <span class="flex items-center gap-2 text-ink-secondary">
+                  <span class="h-2 w-2 rounded-full" [style.backgroundColor]="channelColor(slice.key)"></span>
+                  {{ slice.name }}
+                </span>
+                <span class="font-medium tabular-nums text-ink-primary">{{ channelPct(slice.value) }}%</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="mt-4 text-sm text-ink-muted">No channel data available yet.</p>
+        }
+      } @else {
+        <div class="mt-4 h-56 animate-pulse rounded-xl bg-surface-sunken"></div>
+      }
+    </div>
+  </div>
+</div>
