@@ -1,32 +1,59 @@
-# React + TypeScript + Vite
+# Aria Support — AI Customer Support Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A full-stack dashboard for an AI-assisted customer support product: live
+KPIs, conversation volume and channel mix, an inbox with AI-drafted replies
+and confidence scoring, AI/human agent performance, automation rules, and
+account settings — in light and dark mode.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Layer    | Tech |
+|----------|------|
+| Frontend | Angular 18 (standalone components), Tailwind CSS, Chart.js |
+| Backend  | Play Framework (Scala 2.13) + Anorm |
+| Database | PostgreSQL |
 
-## React Compiler
+The two halves communicate over a plain REST/JSON API — see
+[`docs/API_CONTRACT.md`](docs/API_CONTRACT.md) for every endpoint and its
+exact response shape.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Running locally
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+**Backend** (needs PostgreSQL running locally):
+```bash
+sudo -u postgres psql -c "CREATE USER aria WITH PASSWORD 'aria' SUPERUSER;"
+sudo -u postgres createdb -O aria aria_support
+cd backend && sbt run   # → http://localhost:9000, schema + seed data auto-applied
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+**Frontend**:
+```bash
+cd frontend && npm install && npm start   # → http://localhost:4200
+```
+The dev server proxies `/api/*` to `localhost:9000` (see
+`frontend/proxy.conf.json`), so no CORS config is needed locally.
+
+## Deployment
+
+This repo deploys as two independent free-tier services — see each
+component's README for details:
+
+- **Frontend → GitHub Pages**, via [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml).
+  Fully automatic on every push once Pages is enabled once for the repo
+  (Settings → Pages → Build and deployment → Source: **GitHub Actions**).
+- **Backend → Render**, via the one-click blueprint at
+  [`backend/render.yaml`](backend/render.yaml) (provisions the API and its
+  Postgres database together). See [`backend/README.md`](backend/README.md)
+  for the exact steps.
+
+After the backend is deployed, point the frontend at it by setting `apiBase`
+in `frontend/src/environments/environment.prod.ts` to the Render service URL
+and pushing — the Pages workflow redeploys automatically.
+
+## Project layout
+
+```
+frontend/   Angular app
+backend/    Play Scala API
+docs/       API contract shared by both
+```

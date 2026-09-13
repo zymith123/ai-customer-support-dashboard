@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import {
   Agent,
   AutomationRule,
@@ -17,7 +18,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private readonly base = '/api';
+  private readonly base = `${environment.apiBase}/api`;
 
   constructor(private http: HttpClient) {}
 

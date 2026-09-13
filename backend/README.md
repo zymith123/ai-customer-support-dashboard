@@ -92,6 +92,42 @@ All endpoints are `GET /api/...` and return JSON exactly matching
 - `conf/evolutions/default/1.sql` — schema DDL + seed data (Up/Down)
 - `conf/application.conf` — datasource, evolutions, CORS config
 
+## Deployment (Render, free tier)
+
+`render.yaml` is a Render Blueprint that provisions the API (built from
+`Dockerfile`) and a Postgres database together, wired to each other
+automatically.
+
+1. Create a free account at Render (github login works) if you don't have
+   one — this step needs to happen in your browser, it can't be automated.
+2. Dashboard → **New** → **Blueprint** → connect this GitHub repo. Render
+   detects `backend/render.yaml` and shows both resources it's about to
+   create (`aria-support-api`, `aria-support-db`) — click **Apply**.
+3. First deploy takes a few minutes (Docker build + evolutions). Once live,
+   copy the service's `.onrender.com` URL.
+4. Paste that URL into `frontend/src/environments/environment.prod.ts`
+   (`apiBase`) and push — the GitHub Pages workflow rebuilds the frontend
+   against it automatically.
+
+Free-tier notes: the web service spins down after ~15 minutes idle (next
+request wakes it, ~30-60s cold start), and the free Postgres instance is
+deleted after 90 days unless upgraded to a paid plan. Fine for a portfolio
+demo; not for anything that needs to stay warm or persist long-term
+unattended.
+
+CORS is already configured for the deployed frontend's origin
+(`https://zymith123.github.io`) in `conf/application.conf` — no changes
+needed there unless the Pages URL changes.
+
+Local Docker build/run of this image wasn't verified in the environment
+this was built in (no outbound access to Docker Hub to pull the base
+images) — the packaging (`Dockerfile`, `docker-entrypoint.sh`) was written
+carefully but the JVM app itself is what got tested directly (staged via
+`sbt stage`, run with the same env vars Render injects, confirmed it boots
+in Prod mode, connects to Postgres, and serves correctly). If the first
+Render deploy fails at the Docker build step rather than at runtime,
+that's the part to look at first.
+
 ## Resetting the database
 
 If evolutions ever get into an inconsistent state (e.g. a manual edit to

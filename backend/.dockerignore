@@ -1,0 +1,11 @@
+target/
+project/target/
+project/project/
+*.log
+.bsp/
+.bloop/
+.metals/
+.vscode/
+logs/
+RUNNING_PID
+README.md

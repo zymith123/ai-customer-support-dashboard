@@ -1,0 +1,51 @@
+# Render Blueprint — provisions the API + its Postgres database together.
+# Deploy: https://dashboard.render.com/blueprints → New Blueprint Instance →
+# point at this repo. Render finds this file automatically. Both services
+# are on Render's free tier: the web service spins down after 15 minutes of
+# inactivity (cold start ~30-60s on the next request), and the free Postgres
+# instance is deleted after 90 days unless upgraded — fine for a portfolio
+# demo, not for anything that needs to stay up unattended long-term.
+services:
+  - type: web
+    name: aria-support-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/kpis
+    envVars:
+      # NOT `generateValue: true`: Play requires >=256 bits of entropy for
+      # HS256 JWT signing and this couldn't be verified against Render's
+      # generator without an account. This is a build-time-generated,
+      # verified-256-bit value (openssl rand -hex 32) instead. It signs
+      # session cookies only — this API has no auth/sessions in front of it,
+      # so there's nothing sensitive riding on it. Rotate freely by replacing
+      # the value and redeploying if that ever changes.
+      - key: APPLICATION_SECRET
+        value: 7d026b235ab8477c5b778219f9b0157b3be933e8f569b3e4acc9762f72b2fad4
+      - key: DB_HOST
+        fromDatabase:
+          name: aria-support-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: aria-support-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: aria-support-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: aria-support-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: aria-support-db
+          property: password
+
+databases:
+  - name: aria-support-db
+    plan: free
+    databaseName: aria_support
+    user: aria
