@@ -8,10 +8,12 @@ import {
   ChannelMixSlice,
   ConversationDetail,
   ConversationListItem,
+  ConversationMessage,
   CsatTrendPoint,
   Kpi,
   ResolutionSplitSlice,
   ResponseTimeBucket,
+  Settings,
   TicketCategory,
   VolumeTrendPoint,
 } from '../models/api.models';
@@ -64,5 +66,21 @@ export class ApiService {
 
   getAutomationRules(): Observable<AutomationRule[]> {
     return this.http.get<AutomationRule[]>(`${this.base}/automation-rules`);
+  }
+
+  updateAutomationRule(id: string, enabled: boolean): Observable<AutomationRule> {
+    return this.http.patch<AutomationRule>(`${this.base}/automation-rules/${id}`, { enabled });
+  }
+
+  postMessage(conversationId: string, text: string): Observable<ConversationMessage> {
+    return this.http.post<ConversationMessage>(`${this.base}/conversations/${conversationId}/messages`, { text });
+  }
+
+  getSettings(): Observable<Settings> {
+    return this.http.get<Settings>(`${this.base}/settings`);
+  }
+
+  updateSettings(settings: Settings): Observable<Settings> {
+    return this.http.put<Settings>(`${this.base}/settings`, settings);
   }
 }

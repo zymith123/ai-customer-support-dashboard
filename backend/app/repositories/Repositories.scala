@@ -114,6 +114,17 @@ class AutomationRuleRepository @Inject() (db: Database) {
   def findAll(): Seq[AutomationRule] = db.withConnection { implicit c =>
     SQL("""SELECT id, name, "trigger", "action", enabled, hits FROM automation_rules ORDER BY sort_order""").as(parser.*)
   }
+
+  def updateEnabled(id: String, enabled: Boolean): Option[AutomationRule] = db.withConnection { implicit c =>
+    val updated = SQL("UPDATE automation_rules SET enabled = {enabled} WHERE id = {id}")
+      .on("enabled" -> enabled, "id" -> id)
+      .executeUpdate()
+    if (updated == 0) None
+    else
+      SQL("""SELECT id, name, "trigger", "action", enabled, hits FROM automation_rules WHERE id = {id}""")
+        .on("id" -> id)
+        .as(parser.singleOpt)
+  }
 }
 
 @Singleton
@@ -163,5 +174,79 @@ class ConversationRepository @Inject() (db: Database) {
         ConversationDetail(cid, customer, email, avatarColor, channel, subject, preview, status,
           sentiment, handledBy, agent, waitTime, updated, splitTags(tags), aiSuggestion, aiConfidence, messages)
     }
+  }
+
+  /** Inserts a new message as sent by the human agent (whether typed or via
+    * "use this reply") and returns it. None if the conversation doesn't exist.
+    */
+  def addMessage(conversationId: String, text: String): Option[Message] = db.withConnection { implicit c =>
+    val conversationExists =
+      SQL("SELECT 1 FROM conversations WHERE id = {id}").on("id" -> conversationId).as(SqlParser.scalar[Int].singleOpt).isDefined
+    if (!conversationExists) None
+    else {
+      val nextSortOrder = SQL("SELECT COALESCE(MAX(sort_order), 0) + 1 FROM messages WHERE conversation_id = {id}")
+        .on("id" -> conversationId)
+        .as(SqlParser.scalar[Int].single)
+      val id = "m" + (System.currentTimeMillis() % 10000000000L) + java.util.UUID.randomUUID().toString.take(6)
+      val time = java.time.LocalTime
+        .now(java.time.ZoneOffset.UTC)
+        .format(java.time.format.DateTimeFormatter.ofPattern("h:mm a", java.util.Locale.ENGLISH))
+
+      SQL("""INSERT INTO messages (id, conversation_id, sender, "text", "time", sort_order)
+            VALUES ({id}, {conversationId}, 'agent', {text}, {time}, {sortOrder})""")
+        .on(
+          "id" -> id,
+          "conversationId" -> conversationId,
+          "text" -> text,
+          "time" -> time,
+          "sortOrder" -> nextSortOrder,
+        )
+        .execute()
+
+      Some(Message(id, "agent", text, time))
+    }
+  }
+}
+
+@Singleton
+class SettingsRepository @Inject() (db: Database) {
+  private val parser: RowParser[Settings] =
+    (bool("auto_resolve") ~ bool("proactive_offers") ~ bool("auto_translate") ~ bool("escalate_negative") ~
+      str("tone") ~ int("confidence_threshold") ~ bool("email_digest") ~ bool("slack_alerts") ~
+      str("workspace_name") ~ str("support_email")).map {
+      case autoResolve ~ proactiveOffers ~ autoTranslate ~ escalateNegative ~ tone ~ confidenceThreshold ~
+        emailDigest ~ slackAlerts ~ workspaceName ~ supportEmail =>
+        Settings(autoResolve, proactiveOffers, autoTranslate, escalateNegative, tone, confidenceThreshold,
+          emailDigest, slackAlerts, workspaceName, supportEmail)
+    }
+
+  def get(): Settings = db.withConnection { implicit c =>
+    SQL("""SELECT auto_resolve, proactive_offers, auto_translate, escalate_negative, tone,
+          confidence_threshold, email_digest, slack_alerts, workspace_name, support_email
+          FROM settings WHERE id = 1""").as(parser.single)
+  }
+
+  def update(s: Settings): Settings = db.withConnection { implicit c =>
+    SQL("""UPDATE settings SET
+          auto_resolve = {autoResolve}, proactive_offers = {proactiveOffers},
+          auto_translate = {autoTranslate}, escalate_negative = {escalateNegative},
+          tone = {tone}, confidence_threshold = {confidenceThreshold},
+          email_digest = {emailDigest}, slack_alerts = {slackAlerts},
+          workspace_name = {workspaceName}, support_email = {supportEmail}
+          WHERE id = 1""")
+      .on(
+        "autoResolve" -> s.autoResolve,
+        "proactiveOffers" -> s.proactiveOffers,
+        "autoTranslate" -> s.autoTranslate,
+        "escalateNegative" -> s.escalateNegative,
+        "tone" -> s.tone,
+        "confidenceThreshold" -> s.confidenceThreshold,
+        "emailDigest" -> s.emailDigest,
+        "slackAlerts" -> s.slackAlerts,
+        "workspaceName" -> s.workspaceName,
+        "supportEmail" -> s.supportEmail,
+      )
+      .executeUpdate()
+    s
   }
 }

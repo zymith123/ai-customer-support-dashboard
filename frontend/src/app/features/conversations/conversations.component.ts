@@ -1,4 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { catchError, of } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
@@ -10,7 +11,7 @@ import { ChannelIconComponent } from '../../shared/ui/channel-icon/channel-icon.
 @Component({
   selector: 'app-conversations',
   standalone: true,
-  imports: [AvatarComponent, StatusBadgeComponent, ChannelIconComponent, LucideAngularModule],
+  imports: [AvatarComponent, StatusBadgeComponent, ChannelIconComponent, LucideAngularModule, FormsModule],
   templateUrl: './conversations.component.html',
 })
 export class ConversationsComponent implements OnInit {
@@ -18,6 +19,8 @@ export class ConversationsComponent implements OnInit {
   selectedId = signal<string | null>(null);
   detail = signal<ConversationDetail | null>(null);
   detailLoading = signal(false);
+  replyText = signal('');
+  sending = signal(false);
 
   constructor(private api: ApiService) {}
 
@@ -37,6 +40,7 @@ export class ConversationsComponent implements OnInit {
     this.selectedId.set(id);
     this.detail.set(null);
     this.detailLoading.set(true);
+    this.replyText.set('');
     this.api
       .getConversation(id)
       .pipe(catchError(() => of(null)))
@@ -44,6 +48,30 @@ export class ConversationsComponent implements OnInit {
         this.detail.set(detail);
         this.detailLoading.set(false);
       });
+  }
+
+  send(text: string): void {
+    const trimmed = text.trim();
+    const id = this.selectedId();
+    if (!trimmed || !id || this.sending()) return;
+
+    this.sending.set(true);
+    this.api
+      .postMessage(id, trimmed)
+      .pipe(catchError(() => of(null)))
+      .subscribe((message) => {
+        this.sending.set(false);
+        if (!message) return;
+        this.replyText.set('');
+        const current = this.detail();
+        if (current) {
+          this.detail.set({ ...current, messages: [...current.messages, message] });
+        }
+      });
+  }
+
+  useSuggestion(suggestion: string): void {
+    this.send(suggestion);
   }
 
   roleIcon(from: 'customer' | 'ai' | 'agent'): string {

@@ -137,17 +137,19 @@
                   <td class="py-3 pr-4 text-ink-secondary">{{ r.trigger }} → {{ r.action }}</td>
                   <td class="py-3 pr-4 tabular-nums text-ink-secondary">{{ r.hits }}</td>
                   <td class="py-3">
-                    @if (r.enabled) {
-                      <span
-                        class="rounded-full px-2 py-0.5 text-xs font-medium text-status-good-text"
-                        style="background-color: rgba(12, 163, 12, 0.14)"
-                        >Enabled</span
-                      >
-                    } @else {
-                      <span class="rounded-full bg-surface-sunken px-2 py-0.5 text-xs font-medium text-ink-muted"
-                        >Disabled</span
-                      >
-                    }
+                    <button
+                      type="button"
+                      (click)="toggleRule(r)"
+                      [disabled]="toggling() === r.id"
+                      [attr.aria-pressed]="r.enabled"
+                      class="rounded-full px-2 py-0.5 text-xs font-medium transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-60"
+                      [class.text-status-good-text]="r.enabled"
+                      [class.bg-surface-sunken]="!r.enabled"
+                      [class.text-ink-muted]="!r.enabled"
+                      [style.background-color]="r.enabled ? 'rgba(12, 163, 12, 0.14)' : null"
+                    >
+                      {{ toggling() === r.id ? 'Updating…' : r.enabled ? 'Enabled' : 'Disabled' }}
+                    </button>
                   </td>
                 </tr>
               }

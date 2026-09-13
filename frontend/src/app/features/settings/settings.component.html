@@ -202,15 +202,19 @@
         <button
           type="button"
           (click)="saveWorkspace()"
-          class="rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-strong"
+          [disabled]="saving()"
+          class="rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Save changes
+          {{ saving() ? 'Saving…' : 'Save changes' }}
         </button>
         @if (savedJustNow()) {
           <span class="flex items-center gap-1.5 text-xs font-medium text-status-good-text">
             <lucide-icon name="Check" [size]="14"></lucide-icon>
             Saved
           </span>
+        }
+        @if (saveError(); as error) {
+          <span class="text-xs font-medium text-status-critical">{{ error }}</span>
         }
       </div>
     </div>

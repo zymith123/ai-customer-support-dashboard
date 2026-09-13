@@ -104,3 +104,18 @@ export interface AutomationRule {
   enabled: boolean;
   hits: string;
 }
+
+export type Tone = 'friendly' | 'professional' | 'concise' | 'empathetic';
+
+export interface Settings {
+  autoResolve: boolean;
+  proactiveOffers: boolean;
+  autoTranslate: boolean;
+  escalateNegative: boolean;
+  tone: Tone;
+  confidenceThreshold: number;
+  emailDigest: boolean;
+  slackAlerts: boolean;
+  workspaceName: string;
+  supportEmail: string;
+}

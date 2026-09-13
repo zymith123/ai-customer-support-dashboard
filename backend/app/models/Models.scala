@@ -157,3 +157,32 @@ case class AutomationRule(
 object AutomationRule {
   implicit val writes: Writes[AutomationRule] = Json.writes[AutomationRule]
 }
+
+case class RuleUpdateRequest(enabled: Boolean)
+
+object RuleUpdateRequest {
+  implicit val reads: Reads[RuleUpdateRequest] = Json.reads[RuleUpdateRequest]
+}
+
+case class NewMessageRequest(text: String)
+
+object NewMessageRequest {
+  implicit val reads: Reads[NewMessageRequest] = Json.reads[NewMessageRequest]
+}
+
+case class Settings(
+  autoResolve: Boolean,
+  proactiveOffers: Boolean,
+  autoTranslate: Boolean,
+  escalateNegative: Boolean,
+  tone: String,
+  confidenceThreshold: Int,
+  emailDigest: Boolean,
+  slackAlerts: Boolean,
+  workspaceName: String,
+  supportEmail: String
+)
+
+object Settings {
+  implicit val format: Format[Settings] = Json.format[Settings]
+}

@@ -11,4 +11,8 @@ GET     /api/channel-mix                    controllers.ChannelMixController.lis
 GET     /api/agents                         controllers.AgentController.list
 GET     /api/conversations                  controllers.ConversationController.list
 GET     /api/conversations/:id              controllers.ConversationController.get(id: String)
+POST    /api/conversations/:id/messages     controllers.ConversationController.postMessage(id: String)
 GET     /api/automation-rules               controllers.AutomationRuleController.list
+PATCH   /api/automation-rules/:id           controllers.AutomationRuleController.updateEnabled(id: String)
+GET     /api/settings                       controllers.SettingsController.get
+PUT     /api/settings                       controllers.SettingsController.update

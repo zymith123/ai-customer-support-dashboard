@@ -93,14 +93,20 @@
           <input
             type="text"
             placeholder="Type a reply…"
-            class="flex-1 bg-transparent text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none"
+            [ngModel]="replyText()"
+            (ngModelChange)="replyText.set($event)"
+            (keyup.enter)="send(replyText())"
+            [disabled]="sending()"
+            class="flex-1 bg-transparent text-sm text-ink-primary placeholder:text-ink-muted focus:outline-none disabled:opacity-50"
           />
           <button
             type="button"
-            class="flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-strong"
+            (click)="send(replyText())"
+            [disabled]="sending() || !replyText().trim()"
+            class="flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-50"
           >
             <lucide-icon name="Send" [size]="13"></lucide-icon>
-            Send
+            {{ sending() ? 'Sending…' : 'Send' }}
           </button>
         </div>
       </div>
@@ -139,12 +145,15 @@
         <div class="mt-4 flex gap-2">
           <button
             type="button"
-            class="flex-1 rounded-xl bg-brand px-3 py-2 text-xs font-medium text-white hover:bg-brand-strong"
+            (click)="useSuggestion(suggestion)"
+            [disabled]="sending()"
+            class="flex-1 rounded-xl bg-brand px-3 py-2 text-xs font-medium text-white hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Use this reply
+            {{ sending() ? 'Sending…' : 'Use this reply' }}
           </button>
           <button
             type="button"
+            (click)="replyText.set(suggestion)"
             class="flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-xs font-medium text-ink-secondary hover:bg-surface-sunken"
           >
             <lucide-icon name="Pencil" [size]="13"></lucide-icon>

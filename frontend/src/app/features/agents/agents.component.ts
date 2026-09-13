@@ -14,6 +14,7 @@ import { AvatarComponent } from '../../shared/ui/avatar/avatar.component';
 export class AgentsComponent implements OnInit {
   agents = signal<Agent[] | null>(null);
   rules = signal<AutomationRule[] | null>(null);
+  toggling = signal<string | null>(null);
 
   constructor(private api: ApiService) {}
 
@@ -64,5 +65,19 @@ export class AgentsComponent implements OnInit {
       case 'training':
         return 'var(--color-axis)';
     }
+  }
+
+  toggleRule(rule: AutomationRule): void {
+    if (this.toggling()) return;
+    this.toggling.set(rule.id);
+    const nextEnabled = !rule.enabled;
+    this.api
+      .updateAutomationRule(rule.id, nextEnabled)
+      .pipe(catchError(() => of(null)))
+      .subscribe((updated) => {
+        this.toggling.set(null);
+        if (!updated) return;
+        this.rules.set((this.rules() ?? []).map((r) => (r.id === updated.id ? updated : r)));
+      });
   }
 }
